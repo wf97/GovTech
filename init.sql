@@ -1,70 +1,70 @@
 create database section2;
 
-
+use section2;
 
 CREATE TABLE customer (
-    id int PRIMARY KEY,
-    name varchar(30) NOT NULL,
+    id INT PRIMARY KEY,
+    name VARCHAR(30) NOT NULL,
     phone INTEGER NOT NULL,
-    address varchar(255)  NOT NULL
-
+    address VARCHAR(255) NOT NULL
 );
 
-select * from customer;
-
 CREATE TABLE salesperson (
-    id int PRIMARY KEY,
-    name varchar(255) NOT NULL
+    id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE car (
-    serialNumber varchar(20) PRIMARY KEY,
-    modelName varchar(30) NOT NULL,
-    manufacturer varchar(30) NOT NULL,
+    serialNumber VARCHAR(20) PRIMARY KEY,
+    modelName VARCHAR(30) NOT NULL,
+    manufacturer VARCHAR(30) NOT NULL,
     price FLOAT NOT NULL,
     weight FLOAT NOT NULL
 );
 
 CREATE TABLE transactions (
-    txn_id int PRIMARY KEY,
+    txn_id INT PRIMARY KEY,
     date DATE NOT NULL,
     time TIME NOT NULL,
-	customerID int FOREIGN KEY REFERENCES customer(id),
-	salespersonID int FOREIGN KEY REFERENCES salesperson(id),
-	serialNumber varchar(20) FOREIGN KEY REFERENCES car(serialNumber),
+    customerID INT,
+    salespersonID INT,
+    serialNumber VARCHAR(20)
 );
 
-
+ALTER TABLE transactions ADD FOREIGN KEY (customerID) REFERENCES customer(id);
+ALTER TABLE transactions ADD FOREIGN KEY (salespersonID) REFERENCES salesperson(id);
+ALTER TABLE transactions ADD FOREIGN KEY (serialNumber) REFERENCES car(serialNumber);
 
 /* Query 1 */
-Select cu.name, SUM(ca.price) as spending
-FROM 
-transactions t
-left join 
-car ca
-ON
-t.serialNumber = ca.serialNumber
-left join
-customer cu
-on
-t.customerID = cu.id
+SELECT
+    cu.name, SUM(ca.price) AS spending
+FROM
+    transactions t
+        LEFT JOIN
+    car ca ON t.serialNumber = ca.serialNumber
+        LEFT JOIN
+    customer cu ON t.customerID = cu.id
 GROUP BY cu.name;
 
 /* Query 2 */
-select ca.manufacturer, COUNT(ca.serialNumber) as sales_quantity from
-transactions t 
-left join
-car ca
-on t.serialNumber = ca.serialNumber
-WHERE MONTH(t.date) = MONTH(CURDATE())
-AND
-ca.manufacturer in 
-(select ca.manufacturer sales from
-	transactions t
-	left join
-	car ca
-	on t.serialNumber = ca.serialNumber
-	group by ca.manufacturer
-	order by COUNT(ca.serialNumber) desc
-	LIMIT 3)
+SELECT
+    ca.manufacturer, COUNT(ca.serialNumber) AS sales_quantity
+FROM
+    transactions t
+        LEFT JOIN
+    car ca ON t.serialNumber = ca.serialNumber
+WHERE
+    MONTH(t.date) = MONTH(CURDATE())
+        AND ca.manufacturer IN
+        (SELECT temp.manufacturer FROM
+			(SELECT
+				ca.manufacturer,
+				ROW_NUMBER() OVER (ORDER BY COUNT(ca.serialNumber) DESC) as row_num
+			FROM
+				transactions t
+					LEFT JOIN
+				car ca ON t.serialNumber = ca.serialNumber
+			GROUP BY ca.manufacturer
+			) temp
+            WHERE temp.row_num <= 3)
 GROUP BY ca.manufacturer;
