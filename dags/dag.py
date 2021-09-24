@@ -12,14 +12,18 @@ def process_data(**kwargs):
     data1 = pd.read_csv('./dags/dataset1.csv')
     data2 = pd.read_csv('./dags/dataset2.csv')
     data = pd.concat([data1, data2], axis=0, ignore_index=True)
+    # Drop rows with NA values in name column
     data = data.dropna(axis=0, subset=['name'])
+    # Remove Salutations
     data['name'] = data['name'].replace(['Miss ','Mr\. ','Ms\. ', 'Mrs\. ', 'Dr\. '],'', regex=True)
+    # Split by 1st occurrence of ' ', suffixes such as 'Jr.' goes into last name as well
     data[['first_name', 'last_name']] = data['name'].str.split(' ', 1, expand=True)
+    # Save file
     data.to_csv('./dags/test.csv', index=False)
 
 with DAG(
         dag_id="data_processing_pipeline",
-        schedule_interval='0 1 * * *',
+        schedule_interval='0 1 * * *', # Schedule at 1 am everyday
         default_args={
             "owner": "airflow",
             "retries": 1,
@@ -34,7 +38,6 @@ with DAG(
 
     process_data = PythonOperator(
         task_id="process_data",
-        # bash_command="python data_processing.py",
         python_callable=process_data,
         provide_context=True,
     )
