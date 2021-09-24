@@ -19,6 +19,8 @@ def process_data(**kwargs):
     # Split by 1st occurrence of ' ', suffixes such as 'Jr.' goes into last name as well
     data[['first_name', 'last_name']] = data['name'].str.split(' ', 1, expand=True)
     # Save file
+    data['price'] = data['price'].astype('float')
+    data['above_100'] = data['price'].apply(lambda x: True if x > 100 else False)
     data.to_csv('./dags/test.csv', index=False)
 
 with DAG(
