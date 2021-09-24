@@ -17,6 +17,7 @@ bcrypt==3.2.0
 blinker==1.4
 boto3==1.17.112
 botocore==1.20.112
+Brotli==1.0.9
 cachetools==4.2.2
 category-encoders==2.2.2
 cattrs==1.5.0
@@ -31,6 +32,10 @@ coverage==5.5
 croniter==1.0.15
 cryptography==3.4.8
 cycler==0.10.0
+dash==2.0.0
+dash-core-components==2.0.0
+dash-html-components==2.0.0
+dash-table==5.0.0
 dill==0.3.4
 dnspython==2.1.0
 docutils==0.16
@@ -40,6 +45,7 @@ Flask==1.1.4
 Flask-AppBuilder==3.3.3
 Flask-Babel==1.0.0
 Flask-Caching==1.10.1
+Flask-Compress==1.10.1
 Flask-JWT-Extended==3.25.1
 Flask-Login==0.4.1
 Flask-OpenID==1.3.0
@@ -93,6 +99,7 @@ paramiko==2.7.2
 patsy==0.5.1
 pendulum==2.1.2
 Pillow==8.2.0
+plotly==5.3.1
 pluggy==0.13.1
 ply==3.11
 pprintpp==0.4.0
@@ -161,3 +168,4 @@ Werkzeug==1.0.1
 wincertstore==0.2
 wrapt==1.12.1
 WTForms==2.3.3
+xgboost==1.4.2
